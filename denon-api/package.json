@@ -1,0 +1,14 @@
+{
+  "name": "denon-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "denon-client": "^0.2.4",
+    "dotenv": "^8.2.0",
+    "fastify": "^3.8.0"
+  }
+}
