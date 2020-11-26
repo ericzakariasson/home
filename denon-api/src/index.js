@@ -25,6 +25,7 @@ app.post("/api/command", async (req, res) => {
   try {
     await client.connect();
 
+    console.log(JSON.stringify(req.body, null, 4));
     const { commands } = req.body;
 
     Object.entries(commands).forEach(async ([command, value]) => {
