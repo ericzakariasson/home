@@ -8,14 +8,17 @@ config();
 
 const app = fastify();
 
-const log = (command, message) =>
-  console.log(command, JSON.stringify(message, null, 4));
+const log = {
+  command: (command, message) =>
+    console.log("COMMAND:", command, JSON.stringify(message, null, 4)),
+  error: (message) => console.error("ERROR:", message),
+};
+
+app.get("/api/health", (req, res) => res.send("Healthy"));
 
 app.get("/api/commands", (req, res) =>
   res.send({ commands: Object.keys(commands) })
 );
-
-app.get("/api/health", (req, res) => res.send("Hey there"));
 
 app.post("/api/command", async (req, res) => {
   const client = new DenonClient(process.env.DENON_HOST);
@@ -25,38 +28,38 @@ app.post("/api/command", async (req, res) => {
     const { command, value } = req.body;
 
     if (!commandHandlerMap.has(command)) {
-      log(command, errors.COMMAND_NOT_FOUND);
-      return res.send(errors.COMMAND_NOT_FOUND);
+      log.command(command, errors.COMMAND_NOT_FOUND);
+      return res.code(400).send(errors.COMMAND_NOT_FOUND);
     }
 
     const validator = validationMap.get(command);
     const isValid = validator ? validator(value) : true;
 
     if (!isValid) {
-      log(command, responses.COMMAND_INVALID_VALUE);
-      return res.send(responses.COMMAND_INVALID_VALUE);
+      log.command(command, responses.COMMAND_INVALID_VALUE);
+      return res.code(400).send(responses.COMMAND_INVALID_VALUE);
     }
 
     const handle = commandHandlerMap.get(command);
     await handle(value, client);
 
-    log(rcommand, esponses.COMMAND_HANDLED);
-    return res.send(responses.COMMAND_HANDLED);
+    log.command(command, responses.COMMAND_HANDLED);
+    return res.code(200).send(responses.COMMAND_HANDLED);
   } catch (e) {
-    console.error("Error: ", e);
-    return res.send(errors.UNEXCPECTED_ERROR);
+    log.error(e);
+    return res.code(500).send(errors.UNEXPECTED_ERROR);
   } finally {
     client.disconnect();
   }
 });
 
 async function startServer() {
-  const url = await app.listen(3001);
+  const url = await app.listen(process.env.PORT, "0.0.0.0");
   console.log(`Denon API running on ${url}`);
 }
 
 try {
   startServer();
 } catch (e) {
-  log("Error", e);
+  log.error(e);
 }

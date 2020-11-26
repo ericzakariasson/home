@@ -3,8 +3,8 @@ const errors = {
     code: "COMMAND_NOT_FOUND",
     message: "Command was not found",
   },
-  UNEXCPECTED_ERROR: {
-    code: "UNEXCPECTED_ERROR",
+  UNEXPECTED_ERROR: {
+    code: "UNEXPECTED_ERROR",
     message: "An error occurred",
   },
 };

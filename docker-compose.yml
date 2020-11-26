@@ -1,9 +1,10 @@
 version: "3.8"
 services:
   denon-api:
+    container_name: "denon-api"
     build: ./denon-api
-    command: "npm start"
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
       - DENON_HOST=denon.home
+      - PORT=3000
