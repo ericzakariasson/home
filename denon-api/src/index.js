@@ -25,25 +25,28 @@ app.post("/api/command", async (req, res) => {
   try {
     await client.connect();
 
-    const { command, value } = req.body;
+    const { data } = req.body;
 
-    if (!commandHandlerMap.has(command)) {
-      log.command(command, errors.COMMAND_NOT_FOUND);
-      return res.code(400).send(errors.COMMAND_NOT_FOUND);
-    }
+    Object.entries(data.commands).forEach(async ([command, value]) => {
+      if (!commandHandlerMap.has(command)) {
+        log.command(command, errors.COMMAND_NOT_FOUND);
+        return res.code(400).send(errors.COMMAND_NOT_FOUND);
+      }
 
-    const validator = validationMap.get(command);
-    const isValid = validator ? validator(value) : true;
+      const validator = validationMap.get(command);
+      const isValid = validator ? validator(value) : true;
 
-    if (!isValid) {
-      log.command(command, responses.COMMAND_INVALID_VALUE);
-      return res.code(400).send(responses.COMMAND_INVALID_VALUE);
-    }
+      if (!isValid) {
+        log.command(command, responses.COMMAND_INVALID_VALUE);
+        return res.code(400).send(responses.COMMAND_INVALID_VALUE);
+      }
 
-    const handle = commandHandlerMap.get(command);
-    await handle(value, client);
+      const handle = commandHandlerMap.get(command);
+      await handle(value, client);
 
-    log.command(command, responses.COMMAND_HANDLED);
+      log.command(command, responses.COMMAND_HANDLED);
+    });
+
     return res.code(200).send(responses.COMMAND_HANDLED);
   } catch (e) {
     log.error(e);
