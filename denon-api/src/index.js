@@ -25,8 +25,7 @@ app.post("/api/command", async (req, res) => {
   try {
     await client.connect();
 
-    console.log(JSON.stringify(req.body, null, 4));
-    const { commands } = req.body;
+    const commands = JSON.parse(req.body.commands);
 
     Object.entries(commands).forEach(async ([command, value]) => {
       if (!commandHandlerMap.has(command)) {
