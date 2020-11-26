@@ -25,9 +25,9 @@ app.post("/api/command", async (req, res) => {
   try {
     await client.connect();
 
-    const { data } = req.body;
+    const { commands } = req.body;
 
-    Object.entries(data.commands).forEach(async ([command, value]) => {
+    Object.entries(commands).forEach(async ([command, value]) => {
       if (!commandHandlerMap.has(command)) {
         log.command(command, errors.COMMAND_NOT_FOUND);
         return res.code(400).send(errors.COMMAND_NOT_FOUND);
