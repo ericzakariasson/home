@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  denon-api:
+    build: ./denon-api
+    command: "npm start"
+    ports:
+      - "3001:3001"
+    environment:
+      - DENON_HOST=denon.home

@@ -8,6 +8,9 @@ config();
 
 const app = fastify();
 
+const log = (command, message) =>
+  console.log(command, JSON.stringify(message, null, 4));
+
 app.get("/api/commands", (req, res) =>
   res.send({ commands: Object.keys(commands) })
 );
@@ -22,6 +25,7 @@ app.post("/api/command", async (req, res) => {
     const { command, value } = req.body;
 
     if (!commandHandlerMap.has(command)) {
+      log(command, errors.COMMAND_NOT_FOUND);
       return res.send(errors.COMMAND_NOT_FOUND);
     }
 
@@ -29,12 +33,14 @@ app.post("/api/command", async (req, res) => {
     const isValid = validator ? validator(value) : true;
 
     if (!isValid) {
+      log(command, responses.COMMAND_INVALID_VALUE);
       return res.send(responses.COMMAND_INVALID_VALUE);
     }
 
     const handle = commandHandlerMap.get(command);
     await handle(value, client);
 
+    log(rcommand, esponses.COMMAND_HANDLED);
     return res.send(responses.COMMAND_HANDLED);
   } catch (e) {
     console.error("Error: ", e);
@@ -52,5 +58,5 @@ async function startServer() {
 try {
   startServer();
 } catch (e) {
-  console.error(JSON.stringify(errors.UNEXCPECTED_ERROR, null, 4));
+  log("Error", e);
 }
