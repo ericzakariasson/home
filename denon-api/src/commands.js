@@ -5,7 +5,7 @@ const commands = {
 
 const commandHandlers = {
   [commands.SET_VOLUME]: (value, client) =>
-    client.setVolume(Math.min(value, 50)),
+    client.setVolume(Math.min(parseInt(value), 50)),
   [commands.SET_INPUT]: (value, client) => client.setInput(value),
 };
 
